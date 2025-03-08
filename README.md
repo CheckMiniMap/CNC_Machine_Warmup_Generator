@@ -12,10 +12,10 @@ This Python script generates a CNC warmup G-code program based on user-defined m
 ## Installation
 
 1. Clone this repository:
-   `git clone https://github.com/CheckMiniMap/CNC_Machine_Warmup_Generator.git`
+```git clone https://github.com/CheckMiniMap/CNC_Machine_Warmup_Generator.git```
 
 2. Navigate to the project directory:
-   `cd Heidenhain_Warmup_Generator`
+```cd Heidenhain_Warmup_Generator```
 
 3. Run the script:
-   `python src/main.py`
+```python src/main.py```
