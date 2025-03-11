@@ -2,8 +2,9 @@
 CNC Machine Warmup Generator - Main Script
 Author: John Germing
 Date: 2025-03-08
-Description: This script generates a Heidenhain-compatible CNC warmup G-code
-             program based on user-defined machine parameters.
+Description: This script will prompt for user-defined machine parameters 
+             to generate a Heidenhain TNC640 or Fanuc 31i controller 
+             compatible CNC warmup G-code program.
 """
 
 import os
