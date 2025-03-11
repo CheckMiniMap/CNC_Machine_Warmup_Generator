@@ -19,5 +19,6 @@ DEFAULT_SETTINGS = {
     "finish_rpm": 3000,
     "start_feedrate": 200,
     "finish_feedrate": 800,
-    "coolant": True
+    "coolant": True,
+    "tool_call_num": 1
 }

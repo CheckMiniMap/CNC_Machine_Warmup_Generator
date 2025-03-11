@@ -8,7 +8,7 @@ Description: This script generates a Heidenhain-compatible CNC warmup G-code
 
 import os
 from config import MACHINES, DEFAULT_SETTINGS
-from generator import generate_gcode
+from generator import generate_gcode_heidenhain
 
 def main():
     """ Main function to execute the warmup G-code generator. """
@@ -32,10 +32,11 @@ def main():
     start_feed = int(input(f"Enter start feedrate [{DEFAULT_SETTINGS['start_feedrate']}]: ") or DEFAULT_SETTINGS["start_feedrate"])
     finish_feed = int(input(f"Enter finish feedrate [{DEFAULT_SETTINGS['finish_feedrate']}]: ") or DEFAULT_SETTINGS["finish_feedrate"])
     coolant = input("Enable coolant? (yes/no) [yes]: ").strip().lower() != "no"
+    tool_call_num = int(input(f"Enter tool call number [{DEFAULT_SETTINGS['tool_call_num']}]: ") or DEFAULT_SETTINGS["tool_call_num"])
 
     # Generate G-code
     machine_params = MACHINES[machine_choice]
-    gcode = generate_gcode(machine_params, start_rpm, finish_rpm, start_feed, finish_feed, coolant)
+    gcode = generate_gcode_heidenhain(machine_params, start_rpm, finish_rpm, start_feed, finish_feed, coolant, tool_call_num)
 
     # Save to file
     file_name = input(f"Enter output file name (default: warmup_machine_{machine_choice}): ").strip()
