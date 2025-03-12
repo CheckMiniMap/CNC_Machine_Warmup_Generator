@@ -20,5 +20,5 @@ DEFAULT_SETTINGS = {
     "finish_feedrate": 800,
     "coolant": True,
     "tool_call_num": 1,
-    "increment_steps": 15,
+    "increment_steps": 20,
 }

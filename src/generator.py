@@ -7,7 +7,7 @@ Description: Function(s) for generating Heidenhain TNC640 and Fanuc 31i
 """
 
 def generate_gcode_heidenhain(machine, start_rpm, finish_rpm, start_feed, finish_feed, coolant, tool_call_num, increment_steps):
-    """ Generates Heidenhain-compatible G-code using Q-parameters with optimized coolant activation. """
+    """ Generates Heidenhain TNC640-compatible G-code using variables for machine warmup. """
     gcode = []
     
     # Start Warmup Program
@@ -27,13 +27,13 @@ def generate_gcode_heidenhain(machine, start_rpm, finish_rpm, start_feed, finish
     gcode.append(f"Q96 = {tool_call_num} ; Tool Call Number")
     gcode.append("; =================================")
     gcode.append("; Uneditable Warmup Variables For Program:")
-    gcode.append("Q86 = (Q81 - Q80) / 5 ; Spindle RPM divided into # of moves")
-    gcode.append("Q87 = (Q83 - Q82) / 5 ; Feedrate divided into # of moves")
+    gcode.append("Q86 = (Q81 - Q80) / 4 ; Spindle RPM divided into # of moves")
+    gcode.append("Q87 = (Q83 - Q82) / 4 ; Feedrate divided into # of moves")
     
     gcode.append("Q88 = Q78 / Q85 ; X-Axis increment per step")
     gcode.append("Q89 = Q79 / Q85 ; Y-Axis increment per step")
-    gcode.append("Q90 = (Q81 - Q80) / Q85 ; Spindle RPM increment per step")
-    gcode.append("Q91 = (Q83 - Q82) / Q85 ; Feedrate increment per step")
+    gcode.append("Q90 = Q86 / Q85 ; Spindle RPM increment per step")
+    gcode.append("Q91 = Q87 / Q85 ; Feedrate increment per step")
 
     gcode.append("Q92 = 0 ; Current X position")
     gcode.append("Q93 = 0 ; Current Y position")
@@ -126,7 +126,7 @@ def generate_gcode_heidenhain(machine, start_rpm, finish_rpm, start_feed, finish
     return "\n".join(gcode)
 
 def generate_gcode_fanuc(machine, start_rpm, finish_rpm, start_feed, finish_feed, coolant, tool_call_num, increment_steps):
-    """ Generates Fanuc R31i-compatible G-code using variables for warmup. """
+    """ Generates Fanuc R31i-compatible G-code using variables for machine warmup. """
     gcode = []
     # Start Warmup Program
     gcode.append("% ( Fanuc CNC Warmup Program - START )")
@@ -147,13 +147,13 @@ def generate_gcode_fanuc(machine, start_rpm, finish_rpm, start_feed, finish_feed
     gcode.append("( ============================= )")
 
     gcode.append("( Uneditable Warmup Variables )")
-    gcode.append("#86 = (#81 - #80) / 5 ( Spindle RPM divided into # of moves )")
-    gcode.append("#87 = (#83 - #82) / 5 ( Feedrate divided into # of moves )")
+    gcode.append("#86 = (#81 - #80) / 4 ( Spindle RPM divided into # of moves )")
+    gcode.append("#87 = (#83 - #82) / 4 ( Feedrate divided into # of moves )")
 
     gcode.append("#88 = #78 / #85 ( X-Axis increment per step )")
     gcode.append("#89 = #79 / #85 ( Y-Axis increment per step )")
-    gcode.append("#90 = (#81 - #80) / #85 ( Spindle RPM increment per step )")
-    gcode.append("#91 = (#83 - #82) / #85 ( Feedrate increment per step )")
+    gcode.append("#90 = #86 / #85 ( Spindle RPM increment per step )")
+    gcode.append("#91 = #87 / #85 ( Feedrate increment per step )")
 
     gcode.append("#92 = 0 ( Current X position )")
     gcode.append("#93 = 0 ( Current Y position )")
@@ -232,144 +232,3 @@ def generate_gcode_fanuc(machine, start_rpm, finish_rpm, start_feed, finish_feed
     gcode.append("% ( Fanuc CNC Warmup Program - END )")
 
     return "\n".join(gcode)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Claude
-def generate_gcode_fanuc2(machine, start_rpm, finish_rpm, start_feed, finish_feed, coolant, tool_call_num):
-    """ Generates Fanuc 31i-compatible G-code with optimized coolant activation. """
-    gcode = []
-    
-    # Program header with comments
-    gcode.append("%")  # Program start for Fanuc
-    gcode.append("O1234 (WARMUP PROGRAM)")  # Program number
-    gcode.append("(Fanuc CNC Warmup Program)")
-    gcode.append("(=================================)")
-    gcode.append("(Editable Warmup Parameters:)")
-    gcode.append(f"(X-Axis Travel Limit: {machine['X']})")
-    gcode.append(f"(Y-Axis Travel Limit: {machine['Y']})")
-    gcode.append(f"(Start Spindle RPM: {start_rpm})")
-    gcode.append(f"(Finish Spindle RPM: {finish_rpm})")
-    gcode.append(f"(Start Feedrate: {start_feed})")
-    gcode.append(f"(Finish Feedrate: {finish_feed})")
-    gcode.append(f"(Coolant: {'ON' if coolant else 'OFF'})")
-    gcode.append("(=================================)")
-    
-    # Setup variables using Fanuc macro variables (#100-#199 are common user variables)
-    gcode.append("(Warmup Variables Setup)")
-    gcode.append(f"#100 = {machine['X']} (X-Axis Travel)")
-    gcode.append(f"#101 = {machine['Y']} (Y-Axis Travel)")
-    gcode.append(f"#102 = {start_rpm} (Start RPM)")
-    gcode.append(f"#103 = {finish_rpm} (Finish RPM)")
-    gcode.append(f"#104 = {start_feed} (Start Feed)")
-    gcode.append(f"#105 = {finish_feed} (Finish Feed)")
-    gcode.append(f"#106 = {1 if coolant else 0} (Coolant Flag)")
-    gcode.append("#107 = 15 (Number of Steps for Ramp-up)")
-    
-    # Calculate increments
-    gcode.append("#108 = #100/#107 (X increment per step)")
-    gcode.append("#109 = #101/#107 (Y increment per step)")
-    gcode.append("#110 = (#103-#102)/#107 (RPM increment per step)")
-    gcode.append("#111 = (#105-#104)/#107 (Feed increment per step)")
-    gcode.append("#112 = 0 (Current X position)")
-    gcode.append("#113 = 0 (Current Y position)")
-    gcode.append("#114 = #102 (Current RPM)")
-    gcode.append("#115 = #104 (Current Feed)")
-    
-    # Safe startup
-    gcode.append("(Safe startup regardless of current position, origin table, or tool offsets)")
-    gcode.append("G90 G40 G49 G17 (Absolute positioning, cancel tool comp, cancel tool length, XY plane)")
-    gcode.append("G54 (Select workpiece coordinate system 1)")
-    gcode.append(f"T{tool_call_num} M06 (Tool change)")
-    gcode.append("G43 H00 (Use tool length comp register 0 - effectively canceling it)")
-    
-    # Move to safe Z height
-    gcode.append("G00 Z200. (Rapid to safe Z height)")
-    
-    # Reset work offsets to known state
-    gcode.append("G92 X0 Y0 Z0 (Reset program zero to current position)")
-    
-    # Start spindle at initial speed
-    gcode.append(f"M03 S{start_rpm} (Start spindle CW at initial RPM)")
-    
-    # Move to XY origin at initial feed rate
-    gcode.append("G00 X0 Y0 (Rapid to XY origin)")
-    
-    # Enable coolant if requested
-    gcode.append("IF[#106 EQ 1]THEN(Coolant check)")
-    gcode.append("M08 (Coolant ON if requested)")
-    gcode.append("ENDIF")
-    
-    # First movement pattern: X0 -> Xmax (with increasing feed and RPM)
-    gcode.append("(Pattern 1: X0 to Xmax)")
-    gcode.append("WHILE[#112 LT #100] DO1 (Loop until X reaches max)")
-    gcode.append("  #112 = #112 + #108 (Increment X)")
-    gcode.append("  #114 = #114 + #110 (Increment RPM)")
-    gcode.append("  #115 = #115 + #111 (Increment Feed)")
-    gcode.append("  M03 S#114 (Update spindle speed)")
-    gcode.append("  G01 X#112 Y0 F#115 (Linear move with updated feed)")
-    gcode.append("END1")
-    
-    # Second movement pattern: Y0 -> Ymax (with increasing feed and RPM)
-    gcode.append("(Pattern 2: Y0 to Ymax)")
-    gcode.append("WHILE[#113 LT #101] DO2 (Loop until Y reaches max)")
-    gcode.append("  #113 = #113 + #109 (Increment Y)")
-    gcode.append("  #114 = #114 + #110 (Increment RPM)")
-    gcode.append("  #115 = #115 + #111 (Increment Feed)")
-    gcode.append("  M03 S#114 (Update spindle speed)")
-    gcode.append("  G01 X#100 Y#113 F#115 (Linear move with updated feed)")
-    gcode.append("END2")
-    
-    # Third movement pattern: Xmax -> X0 (with increasing feed and RPM)
-    gcode.append("(Pattern 3: Xmax to X0)")
-    gcode.append("WHILE[#112 GT 0] DO3 (Loop until X reaches 0)")
-    gcode.append("  #112 = #112 - #108 (Decrement X)")
-    gcode.append("  #114 = #114 + #110 (Increment RPM)")
-    gcode.append("  #115 = #115 + #111 (Increment Feed)")
-    gcode.append("  M03 S#114 (Update spindle speed)")
-    gcode.append("  G01 X#112 Y#101 F#115 (Linear move with updated feed)")
-    gcode.append("END3")
-    
-    # Fourth movement pattern: Ymax -> Y0 (with increasing feed and RPM)
-    gcode.append("(Pattern 4: Ymax to Y0)")
-    gcode.append("WHILE[#113 GT 0] DO4 (Loop until Y reaches 0)")
-    gcode.append("  #113 = #113 - #109 (Decrement Y)")
-    gcode.append("  #114 = #114 + #110 (Increment RPM)")
-    gcode.append("  #115 = #115 + #111 (Increment Feed)")
-    gcode.append("  M03 S#114 (Update spindle speed)")
-    gcode.append("  G01 X0 Y#113 F#115 (Linear move with updated feed)")
-    gcode.append("END4")
-    
-    # Final position with final parameters
-    gcode.append("G01 X0 Y0 F#105 (Move to origin with final feed rate)")
-    gcode.append(f"M03 S{finish_rpm} (Final spindle speed)")
-    
-    # Shutdown sequence
-    gcode.append("M05 (Spindle OFF)")
-    gcode.append("M09 (Coolant OFF)")
-    gcode.append("G00 Z200. (Retract to safe Z)")
-    
-    # Program end
-    gcode.append("M30 (Program end and reset)")
-    gcode.append("%")  # Program end for Fanuc
-    
-    return "\n".join(gcode)
-
-

@@ -62,15 +62,16 @@ def main():
     # Also, strip the file extension if the user inputted one. 
     file_name = f"warmup_{controller_type}_{machine_choice}" if not file_name else (file_name.removesuffix(".H") if file_name.endswith(".H") else file_name.removesuffix(".NC") if file_name.endswith(".NC") else file_name)
 
-    # Output generated G-Code in "/outputs" directory.
+    # Create output filename in "/outputs" directory.
     output_file = f"output/{file_name}.H" if cnc_type == 1 else f"output/{file_name}.NC"
     # Create directory if it does not exist.
     os.makedirs("output", exist_ok=True)
 
-    # Write all generated G-Code into file.
+    # Write all generated G-Code into new file in "/outputs" directory.
     with open(output_file, "w") as file:
         file.write(gcode)
 
+    # Program end - Successfully generated g-code warmup file!
     print(f"\nG-code successfully generated and saved to: {output_file}")
 
 
