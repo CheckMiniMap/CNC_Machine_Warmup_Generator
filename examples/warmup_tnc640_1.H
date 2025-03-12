@@ -1,3 +1,4 @@
+BEGIN PGM WARMUP MM
 ; Heidenhain CNC Warmup Program
 ; =================================
 ; Editable Warmup Parameters:
@@ -24,7 +25,6 @@ Q94 = Q80 ; Current Spindle RPM
 Q95 = Q82 ; Current Feedrate
 ; =================================
 
-BEGIN PGM WARMUP MM
 ; Safe startup regardless of current position, origin table, or tool offsets
 TOOL CALL Q96 Z S+Q80 ; Call defined tool #
 L R0 ; Reset tool radius compensation
@@ -43,7 +43,7 @@ Q92 = Q92 + Q88 ; Increment X-axis
 Q94 = Q94 + Q90 ; Increment Spindle RPM
 Q95 = Q95 + Q91 ; Increment Feedrate
 S+Q94 M3 ; Gradually increasing spindle RPM
-L X+Q92 Y+0 R0 F+Q95 ; Move to incremented X while ramping up feedrate
+L X+Q92 Y+0 R0 F+Q95 ; Move to X max and Y 0 while ramping up feedrate
 IF Q92 = Q78 GOTO LBL2 ; If X-axis reaches Q78, end incrementing
 CALL LBL 1 REP Q85 ; Repeat incrementing loop Q85 times
 LBL 2 ; End incrementing from X+0 -> X+Q78
@@ -52,7 +52,7 @@ Q93 = Q93 + Q89 ; Increment Y-axis
 Q94 = Q94 + Q90 ; Increment Spindle RPM
 Q95 = Q95 + Q91 ; Increment Feedrate
 S+Q94 M3 ; Gradually increasing spindle RPM
-L X+Q78 Y+Q93 R0 F+Q95 ; Move to incremented Y while ramping up feedrate
+L X+Q78 Y+Q93 R0 F+Q95 ; Move to X max and Y max while ramping up feedrate
 IF Q93 = Q79 GOTO LBL4 ; If Y-axis reaches Q79, end incrementing
 CALL LBL 3 REP Q85 ; Repeat incrementing loop Q85 times
 LBL 4 ; End incrementing from Y+0 -> Y+Q79
@@ -61,7 +61,7 @@ Q92 = Q92 - Q88 ; Decrement X-axis
 Q94 = Q94 + Q90 ; Increment Spindle RPM
 Q95 = Q95 + Q91 ; Increment Feedrate
 S+Q94 M3 ; Gradually increasing spindle RPM
-L X+Q92 Y+Q79 R0 F+Q95; Return to X0 with Y max
+L X+Q92 Y+Q79 R0 F+Q95; Return to X0 with Y max while ramping up feedrate
 IF Q92 = 0 GOTO LBL6 ; If X-axis reaches 0, end incrementing
 CALL LBL 5 REP Q85; Repeat incrementing loop Q85 times
 LBL 6 ; End incrementing from X+Q78 -> X+0
@@ -70,12 +70,12 @@ Q93 = Q93 - Q89 ; Decrement Y-axis
 Q94 = Q94 + Q90 ; Increment Spindle RPM
 Q95 = Q95 + Q91 ; Increment Feedrate
 S+Q94 M3 ; Gradually increasing spindle RPM
-L X+0 Y+Q93 R0 F+Q95 ; Return to Y0 with X0
+L X+0 Y+Q93 R0 F+Q95 ; Return to Y0 with X0 while ramping up feedrate
 IF Q93 LT 1 GOTO LBL8 ; If Y-axis reaches 0, end incrementing
 CALL LBL 7 REP Q85 ; Repeat incrementing loop Q85 times
 LBL 8 ; End incrementing from Y+Q79 -> Y+0
 L X0 Y0 R0 F+Q83 ; Return to origin
 S+Q81 M3 ; Final spindle speed Q81 RPM
-M9 ; Coolant OFF before spindle stop
 M5 ; Spindle OFF
+M9 ; Coolant OFF
 END PGM WARMUP MM
