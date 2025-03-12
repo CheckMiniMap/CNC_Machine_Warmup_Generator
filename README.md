@@ -7,7 +7,7 @@ This Python script generates a CNC warmup G-code program based on user-defined m
 - Supports multiple CNC machine configurations.
 - Configurable spindle speed and feedrate.
 - Option to enable flood coolant.
-- Outputs G-code formatted for Heidenhain TNC640 controllers.
+- Outputs G-code formatted for Heidenhain TNC640 controllers and Fanuc 31i controllers.
 
 ## Installation
 
