@@ -9,16 +9,16 @@ Q81 = 3000 ; Finish Spindle RPM
 Q82 = 200 ; Start Feedrate (mm/min)
 Q83 = 800 ; Finish Feedrate (mm/min)
 Q84 = 1 ; Coolant (1 = ON, 0 = OFF)
-Q85 = 15 ; Feedrate/spindle RPM ramp-up per move. Increase for more gradual ramp-up.
+Q85 = 20 ; Feedrate/spindle RPM ramp-up per move. Increase for more gradual ramp-up.
 Q96 = 1 ; Tool Call Number
 ; =================================
 ; Uneditable Warmup Variables For Program:
-Q86 = (Q81 - Q80) / 5 ; Spindle RPM divided into # of moves
-Q87 = (Q83 - Q82) / 5 ; Feedrate divided into # of moves
+Q86 = (Q81 - Q80) / 4 ; Spindle RPM divided into # of moves
+Q87 = (Q83 - Q82) / 4 ; Feedrate divided into # of moves
 Q88 = Q78 / Q85 ; X-Axis increment per step
 Q89 = Q79 / Q85 ; Y-Axis increment per step
-Q90 = (Q81 - Q80) / Q85 ; Spindle RPM increment per step
-Q91 = (Q83 - Q82) / Q85 ; Feedrate increment per step
+Q90 = Q86 / Q85 ; Spindle RPM increment per step
+Q91 = Q87 / Q85 ; Feedrate increment per step
 Q92 = 0 ; Current X position
 Q93 = 0 ; Current Y position
 Q94 = Q80 ; Current Spindle RPM
